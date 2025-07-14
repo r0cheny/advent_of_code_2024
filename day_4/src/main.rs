@@ -1,5 +1,3 @@
-use std::usize;
-
 fn check_row(input_string: &str) -> i32 {
     let target_forward = "XMAS".as_bytes();
     let target_backward = "SAMX".as_bytes();
@@ -17,13 +15,50 @@ fn get_column(matrix: &[&str], col_index: usize) -> String {
         .collect()
 }
 
+fn check_diagonal(matrix: &[&str]) -> i32 {
+    let pattern = ['M', 'A', 'S'];
+    let pattern_backward = ['A', 'M', 'X'];
+    let mut count = 0;
+
+    for (row_index, row) in matrix.iter().enumerate() {
+        for (col_index, col) in row.chars().enumerate() {
+            if col == 'X' {
+                if row_index + pattern.len() <= matrix.len()
+                    && col_index + pattern.len() <= row.len()
+                {
+                    if pattern
+                        .iter()
+                        .enumerate()
+                        .all(|(i, &s)| matrix[row_index + i].chars().nth(col_index + i) == Some(s))
+                    {
+                        count = count + 1;
+                    }
+                }
+            } else if col == 'S' {
+                if row_index + pattern.len() <= matrix.len()
+                    && col_index + pattern.len() <= row.len()
+                {
+                    if pattern_backward
+                        .iter()
+                        .enumerate()
+                        .all(|(i, &s)| matrix[row_index + i].chars().nth(col_index + i) == Some(s))
+                    {
+                        count = count + 1;
+                    }
+                }
+            }
+        }
+    }
+    count
+}
+
 fn main() {
     let sample = vec![
         "MMMSXXMASM",
-        "MSAMXMSMSA",
-        "AMXSXMAAMM",
-        "MSAMASMSMX",
-        "XMASAMXAMM",
+        "MSAXXMSMSA",
+        "AMXSMMAAMM",
+        "MSAMAAMSMX",
+        "XMASAMSAMM",
         "XXAMMXXAMA",
         "SMSMSASXSS",
         "SAXAMASAAA",
@@ -41,6 +76,7 @@ fn main() {
         let row = get_column(&sample, i);
         count = count + check_row(&row);
     }
+    count = count + check_diagonal(&sample);
     println!("{:}", count);
 }
 
